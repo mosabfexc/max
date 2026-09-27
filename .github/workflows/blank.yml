@@ -1,0 +1,350 @@
+-- MUSA MAX CODER — SMART EGG STEALER & FAST RETURN
+-- Author: MUSA MAX CODER
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+LocalPlayer.CharacterAdded:Connect(function(newChar)
+    Character = newChar
+end)
+
+-- إزالة الواجهة القديمة لمنع التكرار
+if CoreGui:FindFirstChild("MusaMaxEggHub") then
+    CoreGui:FindFirstChild("MusaMaxEggHub"):Destroy()
+end
+
+-- إنشاء الشاشة الرئيسية
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MusaMaxEggHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+pcall(function()
+    ScreenGui.Parent = CoreGui
+end)
+if not ScreenGui.Parent then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- الزر الدائري العائم (M)
+local OpenButton = Instance.new("TextButton")
+local OpenCorner = Instance.new("UICorner")
+local OpenStroke = Instance.new("UIStroke")
+
+OpenButton.Name = "OpenButton"
+OpenButton.Size = UDim2.new(0, 55, 0, 55)
+OpenButton.Position = UDim2.new(0.05, 0, 0.4, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+OpenButton.Text = "M"
+OpenButton.TextColor3 = Color3.fromRGB(0, 230, 255)
+OpenButton.TextSize = 24
+OpenButton.Font = Enum.Font.FredokaOne
+OpenButton.Active = true
+OpenButton.Draggable = true
+OpenButton.Parent = ScreenGui
+
+OpenCorner.CornerRadius = UDim.new(1, 0)
+OpenCorner.Parent = OpenButton
+
+OpenStroke.Color = Color3.fromRGB(0, 200, 255)
+OpenStroke.Thickness = 2.5
+OpenStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+OpenStroke.Parent = OpenButton
+
+-- نافذة الواجهة الرئيسية
+local MainFrame = Instance.new("Frame")
+local MainCorner = Instance.new("UICorner")
+local MainStroke = Instance.new("UIStroke")
+local TitleLabel = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 330, 0, 460)
+MainFrame.Position = UDim2.new(0.5, -165, 0.5, -230)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
+MainFrame.ClipsDescendants = true
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+MainCorner.CornerRadius = UDim.new(0, 16)
+MainCorner.Parent = MainFrame
+
+MainStroke.Color = Color3.fromRGB(0, 170, 255)
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
+
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(1, -40, 0, 40)
+TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "MUSA HUB — EGG SYSTEM"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 15
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = MainFrame
+
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 8)
+CloseButton.BackgroundColor3 = Color3.fromRGB(230, 50, 50)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.Parent = CloseButton
+
+-- أزرار التحكم
+local SetHomeBtn = Instance.new("TextButton")
+local GoHomeBtn = Instance.new("TextButton")
+local RefreshBtn = Instance.new("TextButton")
+local GoBestEggBtn = Instance.new("TextButton")
+local GoSelectedEggBtn = Instance.new("TextButton")
+
+local function StyleBtn(btn, text, color, pos, size)
+    btn.Size = size or UDim2.new(0, 145, 0, 35)
+    btn.Position = pos
+    btn.BackgroundColor3 = color
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 11
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = MainFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+end
+
+StyleBtn(SetHomeBtn, "📍 حفظ موقع البيت", Color3.fromRGB(40, 160, 90), UDim2.new(0, 15, 0, 45))
+StyleBtn(GoHomeBtn, "🏃 عودة للبيت (مشي 300)", Color3.fromRGB(220, 120, 0), UDim2.new(0, 170, 0, 45))
+StyleBtn(RefreshBtn, "🔄 تحديث القائمة", Color3.fromRGB(70, 70, 90), UDim2.new(0, 15, 0, 85), UDim2.new(0, 300, 0, 30))
+StyleBtn(GoBestEggBtn, "⭐ الذهاب لأقوى بيضة", Color3.fromRGB(180, 0, 220), UDim2.new(0, 15, 0, 120), UDim2.new(0, 300, 0, 35))
+StyleBtn(GoSelectedEggBtn, "⚡ الذهاب للبيضة المحددة", Color3.fromRGB(0, 140, 230), UDim2.new(0, 15, 0, 160), UDim2.new(0, 300, 0, 35))
+
+-- قائمة التمرير للبيض
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Size = UDim2.new(1, -30, 0, 240)
+ScrollFrame.Position = UDim2.new(0, 15, 0, 205)
+ScrollFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 36)
+ScrollFrame.BackgroundTransparency = 0.3
+ScrollFrame.BorderSizePixel = 0
+ScrollFrame.ScrollBarThickness = 6
+ScrollFrame.Parent = MainFrame
+
+local ScrollCorner = Instance.new("UICorner")
+ScrollCorner.CornerRadius = UDim.new(0, 10)
+ScrollCorner.Parent = ScrollFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Parent = ScrollFrame
+
+local SelectedEggObject = nil
+local BestEggObject = nil
+local SelectedButtonInstance = nil
+local SavedHomeCFrame = nil
+local IsMovingHome = false
+
+-- حفظ موقع البيت
+SetHomeBtn.MouseButton1Click:Connect(function()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        SavedHomeCFrame = char.HumanoidRootPart.CFrame
+        SetHomeBtn.Text = "✅ تم حفظ البيت"
+        task.delay(1.5, function() SetHomeBtn.Text = "📍 حفظ موقع البيت" end)
+    end
+end)
+
+-- العودة للبيت عن طريق الحركة بسرعة 300
+GoHomeBtn.MouseButton1Click:Connect(function()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    
+    if SavedHomeCFrame and hrp then
+        if IsMovingHome then return end
+        IsMovingHome = true
+        GoHomeBtn.Text = "⏳ جاري العودة..."
+
+        local distance = (hrp.Position - SavedHomeCFrame.Position).Magnitude
+        local duration = distance / 300
+
+        local tween = TweenService:Create(hrp, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+            CFrame = SavedHomeCFrame
+        })
+        tween:Play()
+        tween.Completed:Connect(function()
+            IsMovingHome = false
+            GoHomeBtn.Text = "🏃 عودة للبيت (مشي 300)"
+        end)
+    else
+        GoHomeBtn.Text = "⚠️ احفظ البيت أولاً"
+        task.delay(1.5, function() GoHomeBtn.Text = "🏃 عودة للبيت (مشي 300)" end)
+    end
+end)
+
+-- فتح وإغلاق الواجهة
+local isMenuOpen = false
+local function ToggleMenu()
+    isMenuOpen = not isMenuOpen
+    if isMenuOpen then
+        MainFrame.Visible = true
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 330, 0, 460),
+            Position = UDim2.new(0.5, -165, 0.5, -230)
+        }):Play()
+    else
+        local tween = TweenService:Create(MainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0)
+        })
+        tween:Play()
+        tween.Completed:Connect(function() if not isMenuOpen then MainFrame.Visible = false end end)
+    end
+end
+
+OpenButton.MouseButton1Click:Connect(ToggleMenu)
+CloseButton.MouseButton1Click:Connect(ToggleMenu)
+
+-- تحويل القيم النصية لرقمية (K, M, B, T)
+local function ParseValue(str)
+    if not str then return 0 end
+    local num = tonumber(string.match(str, "%d+%.?%d*")) or 0
+    if string.find(str, "T") or string.find(str, "t") then
+        return num * 1000000000000
+    elseif string.find(str, "B") or string.find(str, "b") then
+        return num * 1000000000
+    elseif string.find(str, "M") or string.find(str, "m") then
+        return num * 1000000
+    elseif string.find(str, "K") or string.find(str, "k") then
+        return num * 1000
+    end
+    return num
+end
+
+-- فحص الماب مع استبعاد بيض المزارع
+local function ScanMapEggs()
+    local eggList = {}
+    BestEggObject = nil
+    local highestVal = -1
+
+    for _, desc in pairs(workspace:GetDescendants()) do
+        if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+            local text = desc.Text
+            if string.find(text, "B") or string.find(text, "T") or string.find(text, "M") then
+                local val = ParseValue(text)
+                if val > 0 then
+                    local eggObj = desc:FindFirstAncestorOfClass("Model") or desc:FindFirstAncestorOfClass("BasePart")
+                    if eggObj then
+                        local fullName = string.lower(eggObj:GetFullName())
+                        -- استبعاد أي مجسم يتبع مزارع أو منصات زراعة
+                        if not string.find(fullName, "farm") and not string.find(fullName, "plot") and not string.find(fullName, "base") and not string.find(fullName, "spawn") then
+                            table.insert(eggList, {Object = eggObj, Label = text, Value = val})
+                            if val > highestVal then
+                                highestVal = val
+                                BestEggObject = eggObj
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return eggList
+end
+
+-- تحديث قائمة البيض
+local function PopulateEggList()
+    SelectedEggObject = nil
+    SelectedButtonInstance = nil
+
+    for _, child in pairs(ScrollFrame:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+
+    local scannedEggs = ScanMapEggs()
+
+    if #scannedEggs == 0 then
+        local emptyLabel = Instance.new("TextLabel")
+        emptyLabel.Size = UDim2.new(1, 0, 0, 30)
+        emptyLabel.BackgroundTransparency = 1
+        emptyLabel.Text = "اضغط تحديث عند ظهور البيض"
+        emptyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        emptyLabel.Font = Enum.Font.Gotham
+        emptyLabel.TextSize = 12
+        emptyLabel.Parent = ScrollFrame
+        return
+    end
+
+    for idx, data in ipairs(scannedEggs) do
+        local itemBtn = Instance.new("TextButton")
+        itemBtn.Size = UDim2.new(1, -10, 0, 36)
+        itemBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+        
+        local isBest = (data.Object == BestEggObject)
+        itemBtn.Text = (isBest and "⭐ [أقوى بيضة] " or "") .. data.Object.Name .. " (" .. data.Label .. ")"
+        itemBtn.TextColor3 = isBest and Color3.fromRGB(255, 215, 0) or Color3.fromRGB(240, 240, 240)
+        itemBtn.Font = Enum.Font.GothamMedium
+        itemBtn.TextSize = 11
+        itemBtn.Parent = ScrollFrame
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 8)
+        btnCorner.Parent = itemBtn
+
+        itemBtn.MouseButton1Click:Connect(function()
+            SelectedEggObject = data.Object
+            if SelectedButtonInstance then SelectedButtonInstance.BackgroundColor3 = Color3.fromRGB(35, 35, 50) end
+            SelectedButtonInstance = itemBtn
+            itemBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
+        end)
+    end
+
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 10)
+end
+
+RefreshBtn.MouseButton1Click:Connect(PopulateEggList)
+
+-- الانتقال إلى الموقع
+local function TeleportTo(obj)
+    if not obj then return end
+    local targetCF = obj:IsA("Model") and obj:GetPivot() or obj.CFrame
+    local char = LocalPlayer.Character
+    if targetCF and char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = targetCF * CFrame.new(0, 4, 0)
+    end
+end
+
+GoBestEggBtn.MouseButton1Click:Connect(function()
+    if BestEggObject then
+        TeleportTo(BestEggObject)
+    else
+        GoBestEggBtn.Text = "⚠️ اضغط تحديث أولاً"
+        task.delay(1.5, function() GoBestEggBtn.Text = "⭐ الذهاب لأقوى بيضة" end)
+    end
+end)
+
+GoSelectedEggBtn.MouseButton1Click:Connect(function()
+    if SelectedEggObject then
+        TeleportTo(SelectedEggObject)
+    else
+        GoSelectedEggBtn.Text = "⚠️ اختر بيضة من القائمة أولاً"
+        task.delay(1.5, function() GoSelectedEggBtn.Text = "⚡ الذهاب للبيضة المحددة" end)
+    end
+end)
+
+PopulateEggList()
